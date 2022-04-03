@@ -1,0 +1,48 @@
+﻿@page "/Movies"
+@using MovieDataBase.Models
+@using MovieDataBase.Repositories
+@inject MovieRepository movieRepository
+
+<div class="row">
+    <EditForm Model = "NewMovie" OnSubmit="HandleSubmitForm">
+        <label>Name:</label>
+        <InputText @bind-Value = "NewMovie.Name"></InputText>
+        <input type = "submit" value ="Submit" />
+
+    </EditForm>
+</div>
+<div class="row">
+    <ul>
+        @if(MovieList != null && MovieList.Count > 0)
+        {
+            foreach (var movie in MovieList)
+            {
+                <li>@movie.Name</li>
+            }
+        }
+
+    </ul>  
+
+</div>
+
+@code {
+    public Movie NewMovie { get; set; } = new Movie();
+    private List<Movie> MovieList { get; set; } = new List<Movie>();
+
+    protected override void OnInitialized()
+    {
+        MovieList = movieRepository.GetAllMovies();
+    }
+
+    private void HandleSubmitForm()
+    {
+        NewMovie.Created = DateTime.Now;
+        NewMovie.Updated = DateTime.Now;
+
+        movieRepository.AddMovie(NewMovie);
+        NewMovie = new Movie();
+
+        MovieList = movieRepository.GetAllMovies();
+    }
+
+}
